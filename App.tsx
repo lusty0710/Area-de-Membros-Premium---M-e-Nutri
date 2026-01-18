@@ -174,19 +174,23 @@ function App() {
   }, [session]);
 
   const handleUpdateProfile = (data: Partial<StoredUserProfile>) => {
-    // Basic protection against direct event objects
-    if (!data || (data as any).nativeEvent || (data as any).preventDefault) return;
+    // Critical Protection: Prevent circular structures (Events/DOM Nodes) from polluting state
+    if (!data || typeof data !== 'object') return;
+    if ('nativeEvent' in data || 'preventDefault' in data || 'stopPropagation' in data || 'nodeType' in data) {
+      console.warn("Attempted to pass Event/DOM Node to handleUpdateProfile. Ignored.");
+      return;
+    }
 
     const mergedSettings = { ...userSettings, ...data };
     
-    // Sanitize settings to ensure only primitive values are saved
-    // This prevents circular structure errors if an event object accidentally sneaks in
+    // Strict sanitization: Reconstruct object using ONLY primitives
+    // This guarantees no circular references (like HTMLButtonElement) survive
     const safeSettings: StoredUserProfile = {
-      name: mergedSettings.name,
-      avatar: mergedSettings.avatar,
-      babyAge: mergedSettings.babyAge,
-      theme: mergedSettings.theme,
-      darkMode: mergedSettings.darkMode
+      name: typeof mergedSettings.name === 'string' ? mergedSettings.name : userSettings.name,
+      avatar: typeof mergedSettings.avatar === 'string' || mergedSettings.avatar === null ? mergedSettings.avatar : userSettings.avatar,
+      babyAge: typeof mergedSettings.babyAge === 'string' ? mergedSettings.babyAge : userSettings.babyAge,
+      theme: (['rosa', 'lavanda', 'bege'].includes(mergedSettings.theme as any)) ? mergedSettings.theme : userSettings.theme,
+      darkMode: Boolean(mergedSettings.darkMode)
     };
 
     setUserSettings(safeSettings);
@@ -194,8 +198,8 @@ function App() {
     if (data.name || data.avatar) {
       setCurrentUser(prev => ({
         ...prev,
-        name: data.name || prev.name,
-        avatar: data.avatar || prev.avatar
+        name: typeof data.name === 'string' ? data.name : prev.name,
+        avatar: typeof data.avatar === 'string' ? data.avatar : prev.avatar
       }));
     }
 
