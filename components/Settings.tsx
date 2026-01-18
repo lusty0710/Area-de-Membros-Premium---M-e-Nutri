@@ -1,5 +1,5 @@
 import React from 'react';
-import { Moon, Sun, Bell, CreditCard, Shield, HelpCircle, Palette } from 'lucide-react';
+import { Moon, Sun, Bell, CreditCard, Shield, Palette } from 'lucide-react';
 import { StoredUserProfile } from '../types';
 
 interface SettingsProps {
@@ -109,13 +109,6 @@ export const Settings: React.FC<SettingsProps> = ({ currentTheme, isDarkMode, on
           <div className="flex items-center gap-3">
             <Shield className="text-gray-400" size={20} />
             <span className="text-gray-700 font-medium dark:text-gray-300">Privacidade e Dados</span>
-          </div>
-        </div>
-
-        <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100 flex items-center justify-between cursor-pointer hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700">
-          <div className="flex items-center gap-3">
-            <HelpCircle className="text-gray-400" size={20} />
-            <span className="text-gray-700 font-medium dark:text-gray-300">Ajuda e Suporte</span>
           </div>
         </div>
       </div>
